@@ -4,7 +4,8 @@ Bu proje, ValdikSS'in orijinal GoodbyeDPI yazılımı üzerine inşa edilmiş; T
 
 Artık karmaşık `.cmd` dosyalarıyla, klasörlerle veya siyah ekranlarla uğraşmanıza gerek yok. Her şey tek tıkla, otonom olarak çalışır!
 
-![The Takanosu Elite Arayüzü](https://github.com/user-attachments/assets/7e92fec3-0bd2-4263-8055-33d0d1c972e8)
+![The Takanosu Elite Arayüzü](https://github.com/user-attachments/assets/25a6ac7a-86ba-459c-af81-b8fee2c856f6)
+
 
 ---
 
