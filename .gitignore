@@ -1,0 +1,14 @@
+# Derleme çıktıları ve Visual Studio dosyaları
+.vs/
+*.user
+*.aps
+TheTakanosu_Elite/x64/
+TheTakanosu_Elite/GeneratedFiles/
+
+# x64\Release içinden sadece dağıtılan veri dosyalarını takip et (DLL/exe hariç)
+x64/*
+!x64/Release/
+x64/Release/*
+!x64/Release/goodbyedpi/
+x64/Release/goodbyedpi/*
+!x64/Release/goodbyedpi/turkey-blacklist.txt
