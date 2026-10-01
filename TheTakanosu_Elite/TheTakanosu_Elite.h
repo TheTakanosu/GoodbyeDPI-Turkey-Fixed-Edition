@@ -29,12 +29,35 @@
 #include <QLineEdit>
 #include <QListWidget>
 #include <QEvent>
+#include <QCheckBox>
+#include <QMap>
+#include <functional>
+
+// 🚀 Tek bir DPI profilinin tanımı. Parametreler kayıt defterinde ham metin olarak DEĞİL,
+// sadece "id" olarak saklanır; böylece yönetici yetkisiyle çalışan motora dışarıdan komut sokulamaz.
+struct DpiProfile {
+    QString id;
+    QString name;
+    bool is_zapret;
+    QStringList args;
+    QString desc;
+    bool is_dns = false;
+};
+
+// Şifreli DNS modu (kaldırıcı da "--restore-dns" ile kullanır)
+bool takanosu_dns_mode_active();
+bool takanosu_restore_dns();
 
 class PowerToysDashboard : public QWidget {
     Q_OBJECT
 public:
     PowerToysDashboard(QWidget* parent = nullptr);
+    ~PowerToysDashboard();
     void update_theme(bool is_dark);
+    void stop_engine(bool unload_driver);
+    void try_single_profile(const QString& id);
+    void run_self_test(const QString& report_path);
+    bool is_engine_running() const;
 
     QFrame* block_quick;
     QFrame* block_utils;
@@ -49,37 +72,93 @@ public:
     QProgressBar* progress_bar;
     QLabel* lbl_status;
     QPlainTextEdit* log_console;
-    QProcess* motor_process;
-    QProcess* ping_process;
+
+signals:
+    void engine_state_changed(bool active, const QString& profile_name);
+    void notify(const QString& title, const QString& text);
+
+public slots:
+    void start_autonomous_system();
+    void kill_dpi_service();
 
 private slots:
-    void start_autonomous_system();
-    void on_service_removed(int exitCode);
-    void on_service_installed(int exitCode);
-    void on_service_started(int exitCode);
-    void verify_connection(int exitCode);
-    void verify_dpi_connection(int exitCode);
-    void run_auto_test_step();
     void restore_last_session();
     void util_flush_dns();
-    void kill_dpi_service();
     void util_fast_dns();
     void util_restart_adapter();
     void util_ping_test();
     void util_export_logs();
     void util_safe_net_check();
     void util_winsock_reset();
+    void util_diagnostic_report();
+    void game_check();
+    void health_check();
 
 protected:
     void resizeEvent(QResizeEvent* event) override;
+    bool eventFilter(QObject* watched, QEvent* event) override;
+    void update_column_layout();
 
 private:
-    bool is_auto_detect_mode;
+    enum class UiState { Idle, Busy, Success, Fail, Stopped };
+
+    void log(const QString& tag, const QString& text);
+    void set_ui_state(UiState state, const QString& status, const QString& mod);
+    void set_progress(int value, const QString& color);
+    void set_start_button(bool enabled, const QString& text);
+    void apply_combo_style(QComboBox* combo);
+
+    void run_async(const QString& program, const QStringList& args, int timeout_ms,
+                   std::function<void(int exit_code, const QString& output)> done);
+    void check_internet(std::function<void(bool online)> done);
+    void test_dpi_bypass(std::function<void(bool passed, const QString& detail)> done);
+    void probe_discord(int attempts, std::function<void(int ok, int total)> done);
+    void detect_isp(std::function<void(int isp_index, const QString& isp_text)> done);
+
+    bool start_engine(const DpiProfile& profile, QString* error);
+    void start_scan(int isp_index);
+    void build_and_run_scan(int isp_index);
+    void run_auto_test_step();
+    void verify_current_step();
+    void on_bypass_success(const DpiProfile& profile);
+    void on_scan_failed();
+    void fail_no_internet(const QString& log_text);
+    void apply_dns_mode(std::function<void(bool ok, const QString& error)> done);
+    void revert_dns_mode();
+    void begin_profile(const DpiProfile& profile, std::function<void(bool ok, const QString& error)> ready);
+    void restore_wait_step();
+    void self_test_next();
+    void finish_diagnostic_report();
+    void on_game_started(const QString& game);
+    void on_game_stopped();
+    void reset_game_state();
+
     bool is_dark_mode;
+    bool is_busy;
+    bool restoring;
+    bool single_try;
+    bool legacy_cleaned;
+    int scan_generation;
+    DpiProfile pending_restore;
+    QList<DpiProfile> st_profiles;
+    int st_index;
+    QStringList st_report;
+    QString st_path;
+    bool st_in_app;
+    bool game_running;
+    bool game_dns_temp;
+    QString game_name;
+    QString game_paused_profile;
+    int health_fail;
+    UiState ui_state;
     int current_auto_test_index;
-    QStringList auto_test_params;
-    QStringList auto_test_names;
-    QString current_run_param;
+    int restore_retry;
+    QList<DpiProfile> candidates;
+    QString active_profile_id;
+
+    QList<QProcess*> engine_procs;
+    QString engine_output;
+    void* engine_job;
 
     QVBoxLayout* outer_layout;
     QWidget* inner_container;
@@ -93,6 +172,7 @@ class TheTakanosu_Elite : public QMainWindow {
 public:
     TheTakanosu_Elite(QWidget* parent = nullptr);
     ~TheTakanosu_Elite();
+    void run_self_test(const QString& report_path) { dashboard_widget->run_self_test(report_path); }
 
 protected:
     bool nativeEvent(const QByteArray& eventType, void* message, qintptr* result) override;
@@ -111,17 +191,26 @@ private slots:
     void add_to_blacklist();
     void remove_from_blacklist();
     void filter_blacklist(const QString& text);
-    void check_updates();
+    void check_updates(bool manual = false);
+    void on_engine_state_changed(bool active, const QString& profile_name);
+    void save_disabled_profiles();
 
 private:
     QSystemTrayIcon* tray_icon;
     QMenu* tray_menu;
+    QAction* act_toggle_engine;
     void setup_tray_icon();
+    void migrate_legacy_startup();
+    static bool startup_task_exists();
+    static bool create_startup_task();
+    static bool delete_startup_task();
     void setupUi();
     void add_sidebar_btn(const QString& icon, const QString& text, int index);
 
     QScrollArea* create_powertoys_dashboard();
     QWidget* create_mod_settings_page();
+    QWidget* create_dpi_modes_page();
+    void apply_modes_theme(bool is_dark);
     QWidget* create_tools_page();
     QWidget* create_stats_page();
 
@@ -142,6 +231,14 @@ private:
     QLabel* stat_2_desc;
 
     PowerToysDashboard* dashboard_widget;
+    QLabel* modes_header;
+    QComboBox* combo_engine_mode;
+    QList<QFrame*> modes_blocks;
+    QList<QLabel*> modes_titles;
+    QList<QLabel*> modes_descs;
+    QList<QCheckBox*> mode_checks;
+    QList<QPushButton*> mode_try_btns;
+    QMap<QString, QLabel*> mode_status_labels;
     QPushButton* btn_dark_theme;
     QPushButton* btn_light_theme;
     QLabel* mod_settings_header;
@@ -154,6 +251,7 @@ private:
     QLabel* sys_title;
     QPushButton* btn_toggle_startup;
     QPushButton* btn_toggle_tray;
+    QPushButton* btn_toggle_game;
 
     QRect m_safe_geometry;
     bool m_is_overlay_open;
