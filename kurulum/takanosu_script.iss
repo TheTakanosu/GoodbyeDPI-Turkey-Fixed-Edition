@@ -56,7 +56,7 @@ Type: filesandordirs; Name: "{app}\update_cache"
 ; Ana derlenmiş motor paketleniyor
 Source: "{#SourcePath}..\x64\Release\TheTakanosu_Elite.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; Bütün DLL'ler, assets, goodbyedpi, zapret ve blacklist dahil ediliyor; geçici dosyalar dışlanıyor
-Source: "{#SourcePath}..\x64\Release\*"; Excludes: "TheTakanosu_Elite.exe,*.bat,takanosu_logs.txt,startup_task.xml,update_cache,dns_backup.json,selftest_report.txt"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#SourcePath}..\x64\Release\*"; Excludes: "TheTakanosu_Elite.exe,*.bat,takanosu_logs.txt,startup_task.xml,update_cache,dns_backup.json,selftest_report.txt,ozel-liste.txt,eski-liste.txt"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 ; NOT: Başlangıçta çalıştırma artık uygulamanın kendisi tarafından Görev Zamanlayıcı ile ayarlanıyor.
 ; (Yönetici yetkisi isteyen programları Windows "Run" kaydından açılışta sessizce engelliyordu.)
@@ -137,6 +137,14 @@ begin
 
     // Windows'un WinDivert.sys dosyasını kilit listesinden çıkarması için 1.5 saniye bekle
     Sleep(1500);
+
+    // v1.1.0'dan yükseltme: kullanıcının eklediği siteler turkey-blacklist.txt içindeydi ve bu dosyanın
+    // üzerine yazılmak üzere. Önce yedekle; uygulama ilk açılışta kullanıcının sitelerini ozel-liste.txt'ye taşır.
+    // (ozel-liste.txt varsa kurulum zaten v1.2.0+ ve kullanıcının siteleri ayrı dosyada.)
+    if FileExists(ExpandConstant('{app}\goodbyedpi\turkey-blacklist.txt')) and
+       not FileExists(ExpandConstant('{app}\goodbyedpi\ozel-liste.txt')) and
+       not FileExists(ExpandConstant('{app}\goodbyedpi\eski-liste.txt')) then
+      FileCopy(ExpandConstant('{app}\goodbyedpi\turkey-blacklist.txt'), ExpandConstant('{app}\goodbyedpi\eski-liste.txt'), True);
   end;
 end;
 

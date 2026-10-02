@@ -1,6 +1,7 @@
 #pragma warning(disable : 4996)
 
 #include "TheTakanosu_Elite.h"
+#include "kara_liste.h"
 #include <QTimer>
 #include <windows.h>
 #include <windowsx.h>
@@ -117,6 +118,16 @@ static int run_hidden_sync(const QString& exe, const QStringList& args, int time
     if (!p.waitForFinished(timeout_ms)) { p.kill(); p.waitForFinished(1000); return -1; }
     return p.exitCode();
 }
+
+// 📜 Kara listeler: ayrıntı kara_liste.h içinde
+static QString list_dir() { return QCoreApplication::applicationDirPath() + "/goodbyedpi"; }
+static QString shipped_list_path() { return kara_liste::shipped_path(list_dir()); }
+static QString custom_list_path() { return kara_liste::custom_path(list_dir()); }
+static bool custom_list_has_entries() { return kara_liste::custom_has_entries(list_dir()); }
+static int migrate_legacy_blacklist() { return kara_liste::migrate_legacy(list_dir()); }
+using kara_liste::valid_domain;
+static QStringList read_list(const QString& path, bool* ok = nullptr) { return kara_liste::read(path, ok); }
+static bool write_list(const QString& path, const QStringList& lines) { return kara_liste::write(path, lines); }
 
 // ==========================================
 // 🎯 DPI PROFİLLERİ (GoodbyeDPI + Zapret)
@@ -330,6 +341,12 @@ PowerToysDashboard::PowerToysDashboard(QWidget* parent) : QWidget(parent) {
             btn_expand_log->setText("▼ Log Ekranını Genişlet");
         }
         });
+
+    // Motor başlamadan önce: eski sürümden kalan kullanıcı sitelerini özel listeye taşı
+    if (!is_self_test()) {
+        const int moved = migrate_legacy_blacklist();
+        if (moved > 0) log("KARA LİSTE", QString("Önceki sürümde eklediğiniz %1 site özel listenize taşındı (güncellemelerde artık silinmez).").arg(moved));
+    }
 
     QSettings settings(takanosu_settings_path(), QSettings::IniFormat);
     combo_iss->setCurrentIndex(qBound(0, settings.value("last_iss_index", 0).toInt(), combo_iss->count() - 1));
@@ -892,7 +909,9 @@ bool PowerToysDashboard::start_engine(const DpiProfile& profile, QString* error)
     const QString app_dir = QCoreApplication::applicationDirPath();
     const QString gdpi_dir = QDir::toNativeSeparators(app_dir + "/goodbyedpi/x86_64");
     const QString gdpi_exe = gdpi_dir + "\\goodbyedpi.exe";
-    const QString list_path = QDir::toNativeSeparators(app_dir + "/goodbyedpi/turkey-blacklist.txt");
+    const QString list_path = QDir::toNativeSeparators(shipped_list_path());
+    // Kullanıcının eklediği siteler ayrı dosyada; boşsa motora hiç verilmez
+    const QString custom_path = custom_list_has_entries() ? QDir::toNativeSeparators(custom_list_path()) : QString();
     const QString zapret_dir = QDir::toNativeSeparators(app_dir + "/zapret");
 
     struct Launch { QString exe; QStringList args; QString workdir; };
@@ -906,8 +925,13 @@ bool PowerToysDashboard::start_engine(const DpiProfile& profile, QString* error)
         if (!QFileInfo::exists(winws_exe)) { *error = "Zapret motoru bulunamadı (zapret\\winws.exe)."; return false; }
         QStringList args;
         for (QString a : profile.args) {
-            a.replace("{LIST}", list_path);
             a.replace("{FAKE}", zapret_dir + "\\fake\\");
+            if (a.contains("{LIST}")) {
+                // winws --hostlist birden çok kez verilebilir: önce hazır liste, sonra kullanıcının listesi
+                args << QString(a).replace("{LIST}", list_path);
+                if (!custom_path.isEmpty()) args << QString(a).replace("{LIST}", custom_path);
+                continue;
+            }
             args << a;
         }
         launches << Launch{ winws_exe, args, zapret_dir };
@@ -915,7 +939,10 @@ bool PowerToysDashboard::start_engine(const DpiProfile& profile, QString* error)
         launches << Launch{ gdpi_exe, DNS_YANDEX, gdpi_dir };
     }
     else {
-        launches << Launch{ gdpi_exe, profile.args + QStringList{ "--blacklist", list_path }, gdpi_dir };
+        // GoodbyeDPI --blacklist birden çok kez verilebilir
+        QStringList args = profile.args + QStringList{ "--blacklist", list_path };
+        if (!custom_path.isEmpty()) args << "--blacklist" << custom_path;
+        launches << Launch{ gdpi_exe, args, gdpi_dir };
     }
 
     for (const Launch& l : launches) {
@@ -2605,7 +2632,7 @@ QWidget* TheTakanosu_Elite::create_tools_page() {
     bl_title->setStyleSheet("color: #e0e0e0; font-family: 'Segoe UI Variable'; font-size: 16px; font-weight: bold; border: none; background: transparent;");
     bl_layout->addWidget(bl_title);
 
-    bl_desc = new QLabel("DPI bypass motorunun filtreleyeceği ekstra domainleri (site adreslerini) buraya ekleyebilirsiniz.\nÖrnek: roblox.com (Sadece alan adını yazınız, http veya www eklemeyiniz.)\nDeğişiklikler DPI motoru yeniden başlatıldığında geçerli olur.");
+    bl_desc = new QLabel("DPI bypass motorunun filtreleyeceği ekstra domainleri (site adreslerini) buraya ekleyebilirsiniz.\nÖrnek: roblox.com (Sadece alan adını yazınız, http veya www eklemeyiniz.)\n★ ile işaretli siteler sizin ekledikleriniz: listenin başında durur ve güncellemelerde silinmez.\nDeğişiklikler DPI motoru yeniden başlatıldığında geçerli olur.");
     bl_desc->setStyleSheet("color: #a0a0a0; font-family: 'Segoe UI Variable'; font-size: 13px; border: none; background: transparent;");
     bl_desc->setWordWrap(true);
     bl_layout->addWidget(bl_desc);
@@ -2686,25 +2713,33 @@ void TheTakanosu_Elite::filter_blacklist(const QString& text) {
     }
 }
 
+// Liste öğesi: görünen metin "★  site.com" olabilir; gerçek alan adı ve hangi dosyadan geldiği öğe verisinde saklanır
+static const int ROLE_DOMAIN = Qt::UserRole;
+static const int ROLE_CUSTOM = Qt::UserRole + 1;
+
+static void add_list_item(QListWidget* w, const QString& domain, bool custom) {
+    QListWidgetItem* item = new QListWidgetItem(custom ? "★  " + domain : domain);
+    item->setData(ROLE_DOMAIN, domain);
+    item->setData(ROLE_CUSTOM, custom);
+    item->setToolTip(custom ? "Sizin eklediğiniz site (güncellemelerde korunur)" : "Uygulamayla gelen hazır liste");
+    w->addItem(item);
+}
+
 void TheTakanosu_Elite::load_blacklist() {
     blacklist_widget->clear();
-    QString app_dir = QCoreApplication::applicationDirPath();
-    QString list_path = app_dir + "/goodbyedpi/turkey-blacklist.txt";
 
-    QFile file(list_path);
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QTextStream in(&file);
-        while (!in.atEnd()) {
-            QString line = in.readLine().trimmed();
-            if (!line.isEmpty()) {
-                blacklist_widget->addItem(line);
-            }
-        }
-        file.close();
+    // Önce kullanıcının listesi, sonra hazır liste
+    for (const QString& d : read_list(custom_list_path())) add_list_item(blacklist_widget, d, true);
+
+    bool ok = false;
+    const QStringList shipped = read_list(shipped_list_path(), &ok);
+    if (!ok || !QFileInfo::exists(shipped_list_path())) {
+        QListWidgetItem* warn = new QListWidgetItem("⚠️ Liste dosyası bulunamadı! (turkey-blacklist.txt)");
+        warn->setFlags(Qt::NoItemFlags); // seçilip "silinemesin"
+        blacklist_widget->addItem(warn);
+        return;
     }
-    else {
-        blacklist_widget->addItem("⚠️ Liste dosyası bulunamadı! (turkey-blacklist.txt)");
-    }
+    for (const QString& d : shipped) add_list_item(blacklist_widget, d, false);
 }
 
 void TheTakanosu_Elite::add_to_blacklist() {
@@ -2717,69 +2752,60 @@ void TheTakanosu_Elite::add_to_blacklist() {
     if (new_domain.isEmpty()) return; // kutu tamamen boşsa sessizce geç
     new_domain = QString::fromLatin1(QUrl::toAce(new_domain)); // Türkçe karakterli alan adları (IDN) için
 
-    static const QRegularExpression domain_re("^(?=.{3,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9-]{2,63}$");
-    if (!domain_re.match(new_domain).hasMatch()) {
+    if (!valid_domain(new_domain)) {
         input_new_domain->clear();
         input_new_domain->setPlaceholderText("⚠️ Geçersiz alan adı! Örn: yasaklisite.com");
         return;
     }
 
-    QList<QListWidgetItem*> items = blacklist_widget->findItems(new_domain, Qt::MatchExactly);
-    if (!items.isEmpty()) {
+    for (int i = 0; i < blacklist_widget->count(); ++i) {
+        if (blacklist_widget->item(i)->data(ROLE_DOMAIN).toString() == new_domain) {
+            input_new_domain->clear();
+            input_new_domain->setPlaceholderText("ℹ️ Bu site zaten listede.");
+            return;
+        }
+    }
+
+    // Kullanıcının siteleri ayrı dosyaya: kurulum paketi güncellemede bu dosyaya dokunmaz
+    bool ok = false;
+    QStringList custom = read_list(custom_list_path(), &ok);
+    if (ok) {
+        custom << new_domain;
+        ok = write_list(custom_list_path(), custom);
+    }
+    if (!ok) {
+        input_new_domain->setPlaceholderText("⚠️ Liste dosyasına yazılamadı! Uygulamayı yönetici olarak çalıştırın.");
         input_new_domain->clear();
         return;
     }
 
-    QString app_dir = QCoreApplication::applicationDirPath();
-    QString list_path = app_dir + "/goodbyedpi/turkey-blacklist.txt";
-
-    QFile file(list_path);
-    if (file.open(QIODevice::Append | QIODevice::Text)) {
-        QTextStream out(&file);
-        out << "\n" << new_domain;
-        file.close();
-
-        blacklist_widget->addItem(new_domain);
-        input_new_domain->clear();
-        input_new_domain->setPlaceholderText("✔️ Eklendi! Örn: yasaklisite.com");
-        blacklist_widget->scrollToBottom();
-    }
-    else {
-        input_new_domain->setPlaceholderText("⚠️ Liste dosyasına yazılamadı! Uygulamayı yönetici olarak çalıştırın.");
-        input_new_domain->clear();
-    }
+    load_blacklist();
+    filter_blacklist(search_domain->text());
+    input_new_domain->clear();
+    input_new_domain->setPlaceholderText("✔️ Eklendi! Örn: yasaklisite.com");
+    blacklist_widget->scrollToTop();
 }
 
 void TheTakanosu_Elite::remove_from_blacklist() {
     QListWidgetItem* selected_item = blacklist_widget->currentItem();
     if (!selected_item) return;
+    const QString domain = selected_item->data(ROLE_DOMAIN).toString();
+    if (domain.isEmpty()) return; // uyarı satırı gibi gerçek olmayan öğeler
 
-    QString domain_to_remove = selected_item->text();
+    const bool custom = selected_item->data(ROLE_CUSTOM).toBool();
+    const QString path = custom ? custom_list_path() : shipped_list_path();
 
-    QString app_dir = QCoreApplication::applicationDirPath();
-    QString list_path = app_dir + "/goodbyedpi/turkey-blacklist.txt";
-
-    QStringList all_lines;
-    QFile file_in(list_path);
-    if (file_in.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QTextStream in(&file_in);
-        while (!in.atEnd()) {
-            QString line = in.readLine().trimmed();
-            if (!line.isEmpty() && line != domain_to_remove) {
-                all_lines.append(line);
-            }
-        }
-        file_in.close();
+    // Dosya okunamazsa ASLA üzerine yazma (eskiden okunamayan liste boş olarak kaydediliyordu)
+    bool ok = false;
+    QStringList lines = read_list(path, &ok);
+    if (!ok || !QFileInfo::exists(path)) {
+        input_new_domain->setPlaceholderText("⚠️ Liste dosyası okunamadı, hiçbir şey silinmedi.");
+        return;
     }
-
-    QFile file_out(list_path);
-    if (file_out.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QTextStream out(&file_out);
-        for (int i = 0; i < all_lines.size(); ++i) {
-            out << all_lines[i];
-            if (i < all_lines.size() - 1) out << "\n";
-        }
-        file_out.close();
+    lines.removeAll(domain);
+    if (!write_list(path, lines)) {
+        input_new_domain->setPlaceholderText("⚠️ Liste dosyasına yazılamadı! Uygulamayı yönetici olarak çalıştırın.");
+        return;
     }
 
     delete blacklist_widget->takeItem(blacklist_widget->row(selected_item));

@@ -16,3 +16,4 @@ x64/Release/*
 !x64/Release/goodbyedpi/
 x64/Release/goodbyedpi/*
 !x64/Release/goodbyedpi/turkey-blacklist.txt
+!x64/Release/goodbyedpi/eski-varsayilan-liste.txt
