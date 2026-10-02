@@ -2,13 +2,17 @@
 .vs/
 *.user
 *.aps
-TheTakanosu_Elite/x64/
-TheTakanosu_Elite/GeneratedFiles/
+src/x64/
+src/GeneratedFiles/
+
+# Kurulum paketi çıktısı (kurulum/takanosu_script.iss buraya yazar)
+cikti/
 
 # x64\Release içinden sadece dağıtılan veri dosyalarını takip et (DLL/exe hariç)
 x64/*
 !x64/Release/
 x64/Release/*
+!x64/Release/assets/
 !x64/Release/goodbyedpi/
 x64/Release/goodbyedpi/*
 !x64/Release/goodbyedpi/turkey-blacklist.txt

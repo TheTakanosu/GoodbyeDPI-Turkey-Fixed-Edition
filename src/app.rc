@@ -1,8 +1,8 @@
-IDI_ICON1 ICON "C:\\Users\\srewdie\\source\\repos\\TheTakanosu_Elite\\x64\\Debug\\assets\\icon.ico"
+IDI_ICON1 ICON "..\\x64\\Release\\assets\\icon.ico"
 
 1 VERSIONINFO
-FILEVERSION 1, 0, 0, 0
-PRODUCTVERSION 1, 0, 0, 0
+FILEVERSION 1, 2, 0, 0
+PRODUCTVERSION 1, 2, 0, 0
 BEGIN
 BLOCK "StringFileInfo"
 BEGIN
@@ -10,11 +10,11 @@ BLOCK "040904E4"
 BEGIN
 VALUE "CompanyName", "The Takanosu"
 VALUE "FileDescription", "The Takanosu Elite"
-VALUE "FileVersion", "1.0.0.0"
+VALUE "FileVersion", "1.2.0.0"
 VALUE "InternalName", "TheTakanosu_Elite"
 VALUE "OriginalFilename", "TheTakanosu_Elite.exe"
 VALUE "ProductName", "The Takanosu Elite"
-VALUE "ProductVersion", "1.0.0.0"
+VALUE "ProductVersion", "1.2.0.0"
 END
 END
 BLOCK "VarFileInfo"
