@@ -11,7 +11,7 @@
 
 [**⬇️ İndir**](https://github.com/TheTakanosu/GoodbyeDPI-Turkey-Fixed-Edition/releases/latest) · [Sık sorulanlar](docs/sss.md) · [Sorun giderme](docs/sorun-giderme.md) · [Tartışmalar](https://github.com/TheTakanosu/GoodbyeDPI-Turkey-Fixed-Edition/discussions)
 
-![The Takanosu Elite](https://github.com/user-attachments/assets/25a6ac7a-86ba-459c-af81-b8fee2c856f6)
+![The Takanosu Elite ana ekranı](docs/img/ana-ekran.jpg)
 
 </div>
 
@@ -28,14 +28,14 @@ Discord gibi erişimi engellenmiş sitelere VPN kullanmadan erişmenizi sağlar.
 
 ## Kurulum
 
-1. [**Releases**](https://github.com/TheTakanosu/GoodbyeDPI-Turkey-Fixed-Edition/releases/latest) sayfasından `TheTakanosu_Elite_v1.2.0_Setup.exe` dosyasını indirin.
+1. [**Son sürümü indirin**](https://github.com/TheTakanosu/GoodbyeDPI-Turkey-Fixed-Edition/releases/latest). Sayfanın altındaki **Assets** bölümünde `_Setup.exe` ile biten dosya.
 2. Çalıştırın. Eski GoodbyeDPI kurulumlarından kalan servisler kurulum sırasında otomatik temizlenir.
 3. Masaüstündeki **The Takanosu Elite** kısayolunu açın ve **OTONOM SİSTEMİ BAŞLAT**'a basın.
 
 Bu kadar. Uygulama tepsiye iner ve arka planda çalışmaya devam eder.
 
 > [!NOTE]
-> **v1.1.0 kullanıyorsanız** ayrıca bir şey yapmanıza gerek yok. Uygulama açılışta yeni sürümü haber verir ve tek tıkla günceller.
+> **Güncellemeler kendiliğinden gelir.** Yeni sürüm çıktığında uygulama açılışta haber verir ve tek tıkla günceller. Her sürümde nelerin değiştiği [Releases](https://github.com/TheTakanosu/GoodbyeDPI-Turkey-Fixed-Edition/releases) sayfasında yazıyor.
 
 > [!WARNING]
 > **Antivirüs uyarısı alabilirsiniz.** Uygulama, engeli aşmak için WinDivert ağ sürücüsünü kullanıyor. Bu yüzden bazı antivirüsler yanlış alarm verebiliyor. **Kaspersky** sürücüyü engellediği için uygulama Kaspersky açıkken çalışmayabilir. Ayrıntılar: [Virüs mü?](docs/sss.md#antivirüsüm-uyarı-veriyor-virüs-mü)
@@ -44,7 +44,7 @@ Bu kadar. Uygulama tepsiye iner ve arka planda çalışmaya devam eder.
 
 | DPI Modları | Ayarlar |
 |---|---|
-| ![DPI Modları](docs/img/dpi-modlari.png) | ![Ayarlar](docs/img/ayarlar.png) |
+| ![DPI Modları](docs/img/dpi-modlari.jpg) | ![Ayarlar](docs/img/ayarlar.png) |
 | 13 profilin hepsini görün, istediğinizi tek tıkla deneyin | Başlangıçta çalıştırma, Oyun Modu, tema |
 
 ## Bir sorun mu var?
@@ -61,7 +61,7 @@ Bu kadar. Uygulama tepsiye iner ve arka planda çalışmaya devam eder.
 | [Profiller](docs/profiller.md) | 13 profil ne yapar, hangisi kime uygun, gerçek ölçüm sonuçları |
 | [Sık sorulanlar](docs/sss.md) | Virüs uyarısı, ban riski, DNS, başlangıç |
 | [Sorun giderme](docs/sorun-giderme.md) | Tanı raporu, Discord açılmıyor, DNS bozuldu |
-| [Değişiklik günlüğü](CHANGELOG.md) | Sürümlerde neler değişti |
+| [Sürüm notları](https://github.com/TheTakanosu/GoodbyeDPI-Turkey-Fixed-Edition/releases) | Her sürümde neler değişti |
 | [Geliştirme](docs/gelistirme.md) | Kaynaktan derleme |
 | [Lisanslar](docs/lisanslar.md) | Kullanılan üçüncü parti bileşenler |
 
