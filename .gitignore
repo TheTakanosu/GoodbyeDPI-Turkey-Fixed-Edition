@@ -1,0 +1,18 @@
+# Derleme çıktıları ve Visual Studio dosyaları
+.vs/
+*.user
+*.aps
+src/x64/
+src/GeneratedFiles/
+
+# Kurulum paketi çıktısı (kurulum/takanosu_script.iss buraya yazar)
+cikti/
+
+# x64\Release içinden sadece dağıtılan veri dosyalarını takip et (DLL/exe hariç)
+x64/*
+!x64/Release/
+x64/Release/*
+!x64/Release/assets/
+!x64/Release/goodbyedpi/
+x64/Release/goodbyedpi/*
+!x64/Release/goodbyedpi/turkey-blacklist.txt
