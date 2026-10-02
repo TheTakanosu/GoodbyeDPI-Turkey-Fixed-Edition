@@ -33,6 +33,10 @@ Komut satırından:
 MSBuild src\TheTakanosu_Elite.vcxproj -p:Configuration=Release -p:Platform=x64
 ```
 
+## Testler
+
+`test\calistir.cmd` kara liste fonksiyonlarını (`src/kara_liste.h`) uygulamayı açmadan, geçici klasörde gerçek dosyalarla test eder.
+
 ## Kurulum paketi
 
 ```

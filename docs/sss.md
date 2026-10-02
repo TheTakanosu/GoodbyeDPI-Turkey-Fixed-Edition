@@ -34,6 +34,10 @@ Sadece **Şifreli DNS Modu** (ve Oyun Modu) Windows'un DNS ayarına dokunur. Kap
 
 GoodbyeDPI profillerindeki "Yandex DNS" / "Cloudflare DNS" Windows ayarlarınızı değiştirmez. Sadece motor çalışırken DNS isteklerini o adrese yönlendirir.
 
+## Kara listeye eklediğim siteler güncellemede silinir mi?
+
+Hayır. **Araçlar → Özel Kara Liste** bölümünden eklediğiniz siteler ayrı bir dosyada (`goodbyedpi\ozel-liste.txt`) tutulur ve listenin başında ★ ile gösterilir. Güncellemeler bu dosyaya dokunmaz. v1.1.0'da eklediğiniz siteler de ilk açılışta otomatik olarak bu dosyaya taşınır.
+
 ## Bilgisayar açılınca kendiliğinden başlıyor mu?
 
 Evet, **Başlangıçta Çalıştır** açıksa. Uygulama bunun için Windows Görev Zamanlayıcı'yı kullanır, böylece açılışta UAC penceresi çıkmaz. Son kullandığınız profil birkaç saniye içinde yeniden açılır.
