@@ -1,46 +1,75 @@
-# 🚀 The Takanosu Elite: Türkiye ISS Bypass & Otonom Siber Zırh
+<div align="center">
 
-Bu proje, ValdikSS'in orijinal GoodbyeDPI yazılımı üzerine inşa edilmiş; Türkiye'deki ISS (İnternet Servis Sağlayıcı) sansürlerini aşmak için optimize edilmiş ve **oyun trafiğine (ping/gecikme) zerre zarar vermeyen** gelişmiş bir C++/Qt arayüz projesidir.
+# The Takanosu Elite
 
-Artık karmaşık `.cmd` dosyalarıyla, klasörlerle veya siyah ekranlarla uğraşmanıza gerek yok. Her şey tek tıkla, otonom olarak çalışır!
+**Türkiye'deki internet engellerini tek tıkla aşan, oyun dostu GoodbyeDPI + Zapret arayüzü**
 
-![The Takanosu Elite Arayüzü](https://github.com/user-attachments/assets/25a6ac7a-86ba-459c-af81-b8fee2c856f6)
+[![Son sürüm](https://img.shields.io/github/v/release/TheTakanosu/GoodbyeDPI-Turkey-Fixed-Edition?label=s%C3%BCr%C3%BCm&color=6a1b9a)](https://github.com/TheTakanosu/GoodbyeDPI-Turkey-Fixed-Edition/releases/latest)
+[![İndirme](https://img.shields.io/github/downloads/TheTakanosu/GoodbyeDPI-Turkey-Fixed-Edition/total?label=indirme&color=00a65a)](https://github.com/TheTakanosu/GoodbyeDPI-Turkey-Fixed-Edition/releases)
+[![Lisans](https://img.shields.io/github/license/TheTakanosu/GoodbyeDPI-Turkey-Fixed-Edition?label=lisans)](LICENSE)
+![Windows 10/11](https://img.shields.io/badge/Windows-10%20%2F%2011-0078d4)
 
+[**⬇️ İndir**](https://github.com/TheTakanosu/GoodbyeDPI-Turkey-Fixed-Edition/releases/latest) · [Sık sorulanlar](docs/sss.md) · [Sorun giderme](docs/sorun-giderme.md) · [Tartışmalar](https://github.com/TheTakanosu/GoodbyeDPI-Turkey-Fixed-Edition/discussions)
 
----
+![The Takanosu Elite](https://github.com/user-attachments/assets/25a6ac7a-86ba-459c-af81-b8fee2c856f6)
 
-## ⚠️ Önemli Uyarılar
+</div>
 
-* **🛡️ Kaspersky Antivirüsü:** Kaspersky yazılımı, paketin çekirdek seviyesindeki manipülasyonuna (WinDivert) engel olmaktadır. Programın stabil çalışması için Kaspersky'nin tamamen kapatılması veya sistemden kaldırılması gerekebilir.
-* **🚨 VirusTotal & Güvenlik (False Positive):** Uygulamamız, sansürü aşmak için işletim sisteminin derin ağ sürücülerine (Kernel seviyesinde) müdahale eder ve zombi DPI servislerini otomatik kapatır. Bu derin yetkiler sebebiyle bazı antivirüslerin yapay zeka (ML) taramaları uygulamayı "şüpheli" olarak işaretleyebilir (False Positive). Program, 70'ten fazla ana antivirüs motorundan temiz onayı almıştır ve %100 açık kaynak/güvenlidir.
+## Ne işe yarar?
 
----
+Discord gibi erişimi engellenmiş sitelere VPN kullanmadan erişmenizi sağlar. Arka planda [GoodbyeDPI](https://github.com/ValdikSS/GoodbyeDPI) ve [Zapret](https://github.com/bol-van/zapret) motorlarını çalıştırır. Hangi ayarın sizin internetinizde çalıştığını kendisi bulur. Siz sadece başlat düğmesine basarsınız.
 
-## ✨ Yenilikler ve Öne Çıkan Özellikler (v1.1.0)
+- **Otomatik tarama:** ISS'nizi (Türk Telekom, Superonline, TurkNet, Vodafone, Kablonet) tespit eder, 13 profili size uygun sırayla dener. Discord'a **6 kez üst üste** sorunsuz bağlanan ilk profilde durur.
+- **Oyun Modu:** Anti-cheat'li bir oyun (Apex, Fortnite, R6, Rocket League, CS2 + FACEIT…) açılınca motoru ve sürücüyü tamamen kapatır. Oyun sırasında Discord'u şifreli DNS ile ayakta tutar. Oyun kapanınca her şey eski haline döner.
+- **Bilgisayar açılınca kendiliğinden başlar.** UAC penceresi çıkmaz, son çalışan profil birkaç saniyede geri gelir.
+- **Nöbetçi:** İnternetiniz değişirse (modem yeniden başladı, ISS ayar değiştirdi) fark eder ve yeniden tarar.
+- **Ping'e dokunmaz:** Oyun trafiğine müdahale etmez. Ölçümlerde motor açıkken ve kapalıyken gecikme farkı görülmedi.
+- **Açık kaynak:** Kodun tamamı [`src/`](src) klasöründe.
 
-* **🎨 Modern Arayüz (Dashboard):** Tamamen yenilenmiş, karanlık tema destekli profesyonel kontrol paneli.
-* **🤖 5 Aşamalı Otonom Motor:** "Otomatik Algıla" modundayken altyapınızı (Türk Telekom, TurkNet, Superonline, Yakarnet vb.) IP-API üzerinden saniyeler içinde tespit eder ve duvarı yıkacak en doğru siber mermiyi namluya sürer.
-* **⚡ Sıfır Ping Kaybı:** Joker (-5) parametre optimizasyonu sayesinde, DNS yönlendirmesi yapmadan giden paketleri kılıç gibi parçalar. Rekabetçi (E-Spor) oyunlarda milisaniye bile kaybetmezsiniz.
-* **🛠️ Sistem Araçları Merkezi:** Menü üzerinden tek tıkla; DNS Önbelleği Temizleme (Flush DNS), Ağ Adaptörü Yenileme, Zombi Süreçleri Katletme (Kill DPI) ve anlık Ping Testi yapabilirsiniz.
-* **🔄 Otonom Güncelleme (OTA):** Yeni bir sürüm/yama yayınlandığında, sistem sizi otomatik olarak uyarır ve tek tıkla kendini günceller.
+## Kurulum
 
----
+1. [**Releases**](https://github.com/TheTakanosu/GoodbyeDPI-Turkey-Fixed-Edition/releases/latest) sayfasından `TheTakanosu_Elite_v1.2.0_Setup.exe` dosyasını indirin.
+2. Çalıştırın. Eski GoodbyeDPI kurulumlarından kalan servisler kurulum sırasında otomatik temizlenir.
+3. Masaüstündeki **The Takanosu Elite** kısayolunu açın ve **OTONOM SİSTEMİ BAŞLAT**'a basın.
 
-## 📥 Kurulum Rehberi
+Bu kadar. Uygulama tepsiye iner ve arka planda çalışmaya devam eder.
 
-Artık manuel ZIP çıkarma işlemleriyle uğraşmıyoruz. Kurulum sadece 10 saniye sürer!
+> [!NOTE]
+> **v1.1.0 kullanıyorsanız** ayrıca bir şey yapmanıza gerek yok. Uygulama açılışta yeni sürümü haber verir ve tek tıkla günceller.
 
-1. Sağ taraftaki **Releases** bölümünden (veya doğrudan [Buradan](https://github.com/TheTakanosu/GoodbyeDPI-Turkey-Fixed-Edition/releases/latest)) güncel **`TheTakanosu_Elite_Setup.exe`** dosyasını indirin.
-2. Kurulum sihirbazını çalıştırın (Uygulama, eski GoodbyeDPI sürümlerinden kalan çakışmaları ve zombi servisleri kurulum öncesi otomatik temizleyecektir).
-3. Kurulum bitince masaüstünüze gelen `The Takanosu Elite` kısayoluna tıklayın.
-4. Arayüzden **Otomatik Algıla (Önerilen)** modunu seçin ve **YENİDEN BAŞLAT / GÜNCELLE** butonuna basın.
+> [!WARNING]
+> **Antivirüs uyarısı alabilirsiniz.** Uygulama, engeli aşmak için WinDivert ağ sürücüsünü kullanıyor. Bu yüzden bazı antivirüsler yanlış alarm verebiliyor. **Kaspersky** sürücüyü engellediği için uygulama Kaspersky açıkken çalışmayabilir. Ayrıntılar: [Virüs mü?](docs/sss.md#antivirüsüm-uyarı-veriyor-virüs-mü)
 
-*(Not: Uygulama arka planda Windows Servisi olarak sessizce ve kesintisiz çalışır. Zırh aktif edildikten sonra arayüzü kapatabilirsiniz, PC her açıldığında korumanız otomatik olarak devrede olacaktır.)*
+## Ekran görüntüleri
 
----
+| DPI Modları | Ayarlar |
+|---|---|
+| ![DPI Modları](docs/img/dpi-modlari.png) | ![Ayarlar](docs/img/ayarlar.png) |
+| 13 profilin hepsini görün, istediğinizi tek tıkla deneyin | Başlangıçta çalıştırma, Oyun Modu, tema |
 
-## 📜 Credits & Teşekkür
+## Bir sorun mu var?
 
-* **Base Software:** ValdikSS
-* **Original Turkey Configs:** Çağrı Taşkın
-* **Optimization, Autonomous Engine & UI (Elite Edition):** TheTakanosu
+1. Uygulamada **🩺 Tanı Raporu Oluştur** düğmesine basın. Rapor panoya kopyalanır.
+2. [Tartışmalar](https://github.com/TheTakanosu/GoodbyeDPI-Turkey-Fixed-Edition/discussions) sayfasında ya da [yeni bir hata bildiriminde](https://github.com/TheTakanosu/GoodbyeDPI-Turkey-Fixed-Edition/issues/new/choose) paylaşın.
+
+Özellikle **Vodafone ve Kablonet** kullanıcılarının raporları çok değerli, bu altyapılar için henüz yeterli veri yok.
+
+## Belgeler
+
+| | |
+|---|---|
+| [Profiller](docs/profiller.md) | 13 profil ne yapar, hangisi kime uygun, gerçek ölçüm sonuçları |
+| [Sık sorulanlar](docs/sss.md) | Virüs uyarısı, ban riski, DNS, başlangıç |
+| [Sorun giderme](docs/sorun-giderme.md) | Tanı raporu, Discord açılmıyor, DNS bozuldu |
+| [Değişiklik günlüğü](CHANGELOG.md) | Sürümlerde neler değişti |
+| [Geliştirme](docs/gelistirme.md) | Kaynaktan derleme |
+| [Lisanslar](docs/lisanslar.md) | Kullanılan üçüncü parti bileşenler |
+
+## Teşekkürler
+
+- **[ValdikSS](https://github.com/ValdikSS/GoodbyeDPI):** GoodbyeDPI
+- **[bol-van](https://github.com/bol-van/zapret):** Zapret
+- **Çağrı Taşkın:** ilk Türkiye yapılandırmaları
+- **TheTakanosu:** otonom motor, arayüz ve Elite sürümü
+
+Bu proje [GPL-3.0](LICENSE) lisanslıdır.

@@ -1,0 +1,40 @@
+name: 🐞 Hata bildirimi
+description: Bir şey çalışmıyor mu? Tanı raporuyla birlikte bildirin.
+labels: ["hata"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Bildirimden önce uygulamada **🩺 Tanı Raporu Oluştur** düğmesine basın. Rapor panoya kopyalanır, aşağıya yapıştırmanız yeterli.
+        Nasıl yapılır: [Sorun giderme](https://github.com/TheTakanosu/GoodbyeDPI-Turkey-Fixed-Edition/blob/main/docs/sorun-giderme.md)
+  - type: dropdown
+    id: iss
+    attributes:
+      label: İnternet servis sağlayıcınız
+      options:
+        - Türk Telekom
+        - Superonline (Turkcell)
+        - TurkNet
+        - Vodafone
+        - Kablonet
+        - Diğer / bilmiyorum
+    validations:
+      required: true
+  - type: textarea
+    id: sorun
+    attributes:
+      label: Ne oldu?
+      description: Ne yapmaya çalıştınız, ne bekliyordunuz, ne oldu?
+    validations:
+      required: true
+  - type: textarea
+    id: rapor
+    attributes:
+      label: Tanı raporu
+      description: Uygulamanın panoya kopyaladığı raporu buraya yapıştırın (Ctrl+V).
+      render: text
+  - type: input
+    id: surum
+    attributes:
+      label: Uygulama sürümü
+      placeholder: "ör. 1.2.0"
