@@ -2,7 +2,7 @@
 ; 🚀 BUM! UYGULAMA KİMLİĞİ VE YAYINCI BİLGİLERİ
 AppId={{TAKANOSU-ELITE-SIBER-ZIRH-V1}
 AppName=The Takanosu Elite
-AppVersion=1.2.0
+AppVersion=1.3.0
 AppPublisher=TheTakanosu
 AppPublisherURL=https://github.com/TheTakanosu/GoodbyeDPI-Turkey-Fixed-Edition
 AppSupportURL=https://github.com/TheTakanosu/GoodbyeDPI-Turkey-Fixed-Edition
@@ -18,8 +18,8 @@ DefaultGroupName=The Takanosu Elite
 
 ; Kurulum dosyası deponun cikti\ klasörüne çıkar (git'te yok sayılır)
 OutputDir={#SourcePath}..\cikti
-; 🚀 Sürüm ismi v1.2.0 Setup olarak güncellendi! (Uygulama içi güncelleyici "TheTakanosu_Elite...._Setup.exe" adını arar)
-OutputBaseFilename=TheTakanosu_Elite_v1.2.0_Setup
+; 🚀 Sürüm ismi v1.3.0 Setup olarak güncellendi! (Uygulama içi güncelleyici "TheTakanosu_Elite...._Setup.exe" adını arar)
+OutputBaseFilename=TheTakanosu_Elite_v1.3.0_Setup
 
 ; 🎨 GÖRSEL TASARIM AYARLARI
 SetupIconFile={#SourcePath}..\x64\Release\assets\icon.ico
@@ -37,7 +37,7 @@ Name: "turkish"; MessagesFile: "compiler:Languages\Turkish.isl"
 
 [Messages]
 turkish.WelcomeLabel1=The Takanosu Elite Kurulum Sihirbazına Hoş Geldiniz!
-turkish.WelcomeLabel2=Bu sihirbaz, bilgisayarınıza özgür ve sansürsüz internetin anahtarını (The Takanosu Elite v1.2.0) kuracaktır.%n%nDevam etmeden önce lütfen diğer tüm uygulamaları kapatın. Kuruluma hazır olduğunuzda 'İleri' butonuna basın!
+turkish.WelcomeLabel2=Bu sihirbaz, bilgisayarınıza özgür ve sansürsüz internetin anahtarını (The Takanosu Elite v1.3.0) kuracaktır.%n%nDevam etmeden önce lütfen diğer tüm uygulamaları kapatın. Kuruluma hazır olduğunuzda 'İleri' butonuna basın!
 turkish.WizardReady=The Takanosu Elite Kuruluma Hazır!
 turkish.ReadyLabel2=Elite motorunu (GoodbyeDPI + Zapret), güncel kara listeyi ve gerekli tüm ağ protokollerini yüklemek için 'Kur' butonuna basın.
 turkish.FinishedHeadingLabel=The Takanosu Elite Başarıyla Kuruldu!
@@ -56,7 +56,7 @@ Type: filesandordirs; Name: "{app}\update_cache"
 ; Ana derlenmiş motor paketleniyor
 Source: "{#SourcePath}..\x64\Release\TheTakanosu_Elite.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; Bütün DLL'ler, assets, goodbyedpi, zapret ve blacklist dahil ediliyor; geçici dosyalar dışlanıyor
-Source: "{#SourcePath}..\x64\Release\*"; Excludes: "TheTakanosu_Elite.exe,*.bat,takanosu_logs.txt,startup_task.xml,update_cache,dns_backup.json,selftest_report.txt,ozel-liste.txt,eski-liste.txt"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#SourcePath}..\x64\Release\*"; Excludes: "TheTakanosu_Elite.exe,*.bat,takanosu_logs.txt,startup_task.xml,update_cache,dns_backup.json,selftest_report.txt,ozel-liste.txt,eski-liste.txt,baglanti.conf,config.json,motor-liste.txt,motor-ozel-liste.txt"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 ; NOT: Başlangıçta çalıştırma artık uygulamanın kendisi tarafından Görev Zamanlayıcı ile ayarlanıyor.
 ; (Yönetici yetkisi isteyen programları Windows "Run" kaydından açılışta sessizce engelliyordu.)
@@ -76,9 +76,13 @@ Filename: "https://github.com/TheTakanosu/GoodbyeDPI-Turkey-Fixed-Edition/discus
 Filename: "{sys}\taskkill.exe"; Parameters: "/F /IM TheTakanosu_Elite.exe"; Flags: runhidden; RunOnceId: "KillApp"
 Filename: "{sys}\taskkill.exe"; Parameters: "/F /IM goodbyedpi.exe"; Flags: runhidden; RunOnceId: "KillGdpi"
 Filename: "{sys}\taskkill.exe"; Parameters: "/F /IM winws.exe"; Flags: runhidden; RunOnceId: "KillWinws"
+Filename: "{sys}\taskkill.exe"; Parameters: "/F /IM sing-box.exe"; Flags: runhidden; RunOnceId: "KillSingBox"
 
 ; 1b. ŞİFRELİ DNS MODU AÇIKSA KULLANICININ ESKİ DNS AYARLARINI GERİ YÜKLE
 Filename: "{app}\TheTakanosu_Elite.exe"; Parameters: "--restore-dns"; Flags: runhidden waituntilterminated; RunOnceId: "RestoreDns"
+
+; 1c. TÜNEL MODUNUN DNS KURALLARINI (NRPT) SİL, YOKSA LİSTEDEKİ SİTELER AÇILMAZ KALIR
+Filename: "{app}\TheTakanosu_Elite.exe"; Parameters: "--tunnel-cleanup"; Flags: runhidden waituntilterminated; RunOnceId: "TunnelCleanup"
 
 ; 2. BAŞLANGIÇ GÖREVİNİ SİL
 Filename: "{sys}\schtasks.exe"; Parameters: "/Delete /TN ""TheTakanosu Elite"" /F"; Flags: runhidden; RunOnceId: "DelTask"

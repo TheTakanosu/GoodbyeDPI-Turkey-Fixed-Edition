@@ -498,3 +498,5 @@ discord.new
 discord.co
 discordcdn.com
 discord-attachments-uploads-prd.storage.googleapis.com
+protonvpn.com
+proton.me

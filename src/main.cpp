@@ -4,6 +4,7 @@
 #include <QProcess>
 #include <QTimer>
 #include <cstring>
+#include <QFile>
 
 int main(int argc, char *argv[])
 {
@@ -14,7 +15,19 @@ int main(int argc, char *argv[])
         // Kaldırıcı çağırır: şifreli DNS modu açıksa önceki DNS ayarlarını geri yükle ve çık
         if (strcmp(argv[i], "--restore-dns") == 0) {
             QCoreApplication core(argc, argv);
-            return takanosu_restore_dns() ? 0 : 1;
+            const bool v6 = takanosu_restore_ipv6_dns();
+            return (takanosu_restore_dns() && v6) ? 0 : 1;
+        }
+        if (strcmp(argv[i], "--scan-games") == 0 && i + 1 < argc) {
+            QCoreApplication core(argc, argv);
+            QFile f(QString::fromLocal8Bit(argv[i + 1]));
+            if (!f.open(QIODevice::WriteOnly | QIODevice::Text)) return 1;
+            f.write(takanosu_scan_games_report().toUtf8());
+            return 0;
+        }
+        if (strcmp(argv[i], "--tunnel-cleanup") == 0) {
+            QCoreApplication core(argc, argv);
+            return takanosu_tunnel_cleanup() ? 0 : 1;
         }
     }
     if (self_test) {

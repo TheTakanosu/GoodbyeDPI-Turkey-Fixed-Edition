@@ -47,10 +47,19 @@ struct DpiProfile {
 // Şifreli DNS modu (kaldırıcı da "--restore-dns" ile kullanır)
 bool takanosu_dns_mode_active();
 bool takanosu_restore_dns();
+// IPv6 DNS kontrolünün "Düzelt"iyle değiştirilen kartları önceki haline döndürür (kaldırıcı "--restore-dns" ile)
+bool takanosu_restore_ipv6_dns();
+// Tünel modunun DNS yönlendirme kurallarını (NRPT) siler (kaldırıcı "--tunnel-cleanup" ile kullanır)
+bool takanosu_tunnel_cleanup();
+// Tanı: kurulu oyun taraması ("--scan-games <dosya>")
+QString takanosu_scan_games_report();
+
+class QProcess;
 
 class PowerToysDashboard : public QWidget {
     Q_OBJECT
 public:
+    void log_event(const QString& tag, const QString& text) { log(tag, text); }
     PowerToysDashboard(QWidget* parent = nullptr);
     ~PowerToysDashboard();
     void update_theme(bool is_dark);
@@ -58,6 +67,9 @@ public:
     void try_single_profile(const QString& id);
     void run_self_test(const QString& report_path);
     bool is_engine_running() const;
+    // Tünel açılıp kapanınca liste filtresi değişir: çalışan profili aynı ayarla yeniden başlat
+    void reapply_engine();
+    bool busy() const { return is_busy; }
 
     QFrame* block_quick;
     QFrame* block_utils;
@@ -91,6 +103,7 @@ private slots:
     void util_safe_net_check();
     void util_winsock_reset();
     void util_diagnostic_report();
+    void util_ipv6_dns_check();
     void game_check();
     void health_check();
 
@@ -129,7 +142,7 @@ private:
     void restore_wait_step();
     void self_test_next();
     void finish_diagnostic_report();
-    void on_game_started(const QString& game);
+    void on_game_started(const QString& game, const QString& action = "off", const QString& profile_id = QString());
     void on_game_stopped();
     void reset_game_state();
 
@@ -143,11 +156,13 @@ private:
     QList<DpiProfile> st_profiles;
     int st_index;
     QStringList st_report;
+    QStringList st_ipv6_lines;
     QString st_path;
     bool st_in_app;
     bool game_running;
     bool game_dns_temp;
     QString game_name;
+    QString game_action;
     QString game_paused_profile;
     int health_fail;
     UiState ui_state;
@@ -252,6 +267,40 @@ private:
     QPushButton* btn_toggle_startup;
     QPushButton* btn_toggle_tray;
     QPushButton* btn_toggle_game;
+    QFrame* games_block = nullptr;
+    QLabel* games_title = nullptr;
+    QLabel* games_desc = nullptr;
+    QListWidget* games_list = nullptr;
+    QPushButton* btn_games_autoscan = nullptr;
+    QList<QPushButton*> games_btns;
+    void apply_games_theme(bool is_dark);
+    void reload_games_list();
+    void scan_games_dialog();
+    void auto_add_games();
+    void edit_game_rule(int row);
+    QWidget* create_tunnel_page();
+    void apply_tunnel_theme(bool is_dark);
+    void reload_tunnel_ui();
+    void show_tunnel_qr();
+    void start_tunnel();
+    void stop_tunnel(bool remove_dns_rules);
+    void check_tunnel_exit();
+    QProcess* tunnel_proc = nullptr;
+    void* tunnel_job = nullptr;
+    bool tunnel_stopping = false;
+    int tunnel_restarts = 0;
+    QLabel* tunnel_header = nullptr;
+    QList<QFrame*> tunnel_blocks;
+    QList<QLabel*> tunnel_titles;
+    QList<QLabel*> tunnel_descs;
+    QLabel* tunnel_conf_label = nullptr;
+    QPushButton* btn_tunnel_qr = nullptr;
+    bool tunnel_pending = false; // açılışta tünel kurulmayı bekliyor (motor testleri bitince)
+    QLabel* tunnel_status = nullptr;
+    QListWidget* tunnel_list = nullptr;
+    QLineEdit* tunnel_input = nullptr;
+    QPushButton* btn_tunnel_toggle = nullptr;
+    QList<QPushButton*> tunnel_btns;
 
     QRect m_safe_geometry;
     bool m_is_overlay_open;
@@ -274,4 +323,4 @@ private:
     QVBoxLayout* sidebar_layout;
     QPushButton* btn_hamburger;
     QList<QPushButton*> sidebar_btns;
-};
+};
